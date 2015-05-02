@@ -1,0 +1,60 @@
+oracle11_environ:
+  ORACLE_HOME: /usr/lib/oracle/11.2/client64/
+
+python_versions:
+  - 2.7
+  - 3.2
+  - 3.3
+  - 3.4
+
+python2_versions:
+  - 2.7
+
+python3_versions:
+  - 3.2
+  - 3.3
+  - 3.4
+
+python2_packages:
+  - bcrypt
+  - coverage
+  - cx_oracle
+  - docutils
+  - jinja2
+  - Markdown
+  - mock
+  - mysqlclient
+  - MySQL-python
+  - numpy
+  - numpy==1.8.2
+  - Pillow
+  - py-bcrypt
+  - psycopg2
+  - python-memcached
+  - pytz
+  - PyYAML
+  - selenium
+  - sqlparse
+  - Textile
+
+python3_packages:
+  - bcrypt
+  - coverage
+  - cx_oracle
+  - docutils
+  - isort
+  - jinja2
+  - mock
+  - mysqlclient
+  - git+git://github.com/clelland/MySQL-for-Python-3.git
+  - numpy
+  - numpy==1.8.2
+  - Pillow
+  - psycopg2
+  - pyenchant
+  - python3-memcached
+  - pytz
+  - PyYAML
+  - selenium
+  - sphinxcontrib-spelling
+  - sqlparse

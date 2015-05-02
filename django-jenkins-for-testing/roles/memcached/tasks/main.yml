@@ -1,0 +1,14 @@
+- name: install memcache
+  sudo: yes
+  apt: pkg=memcached
+
+- name: remove existing memcache config
+  sudo: yes
+  file: dest=/etc/memcached.conf state=absent
+
+- name: write memcached.conf
+  sudo: yes
+  template: src=memcached.conf dest=/etc/memcached_server{{ item }}.conf mode=0644
+  with_sequence: count={{ num_executors }}
+  notify:
+    - restart memcached

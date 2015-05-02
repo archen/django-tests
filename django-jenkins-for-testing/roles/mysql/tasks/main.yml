@@ -1,0 +1,53 @@
+- name: install MySQL
+  sudo: yes
+  apt: pkg={{ item }}
+  with_items:
+    - mysql-server-5.6
+    - libmysqlclient-dev
+    - python-mysqldb
+
+- name: ensure user has access to database
+  sudo: yes
+  sudo_user: mysql
+  mysql_user: name=django password=XXX priv=*.*:ALL
+
+- name: create databases
+  sudo: yes
+  sudo_user: mysql
+  mysql_db: name={{ item }}
+  with_items:
+    - django
+    - django2
+    - django_gis
+    - django2_gis
+
+- name: Install MySQL config file
+  sudo: yes
+  template: src=my.cnf
+            dest=/etc/mysql/my.cnf
+            owner=root group=root
+  notify:
+    - restart mysql
+
+- name: load timezone definitions
+  shell: mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+
+- name: create RAM filesytem directory
+  sudo: yes
+  action: file path=/mnt/mysql_tmpfs state=directory
+          owner=mysql group=mysql
+
+- name: create RAM filesystem fstab entry
+  sudo: yes
+  mount: name=/mnt/mysql_tmpfs src=tmpfs fstype=tmpfs opts="size=2048m" state=mounted
+
+- name: Install init script to create MySQL tmpfs on boot
+  sudo: yes
+  template: src=create-mysql-tmpfs.conf
+    dest=/etc/init/create-mysql-tmpfs.conf
+
+- name: create MySQL apparmor config
+  sudo: yes
+  copy: src=usr.sbin.mysqld dest=/etc/apparmor.d/usr.sbin.mysqld
+  notify:
+    - restart apparmor

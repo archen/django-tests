@@ -1,0 +1,3 @@
+The pysqlite wheels are built manually with the ``enable_load_extension``
+as described in the `GeoDjango installation instructions
+<https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/spatialite/#pysqlite2>`_.

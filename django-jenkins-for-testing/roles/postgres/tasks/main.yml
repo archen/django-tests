@@ -1,0 +1,74 @@
+- name: Add PostgreSQL packages sources list
+  sudo: yes
+  copy: src=pgdg.list dest=/etc/apt/sources.list.d/pgdg.list
+  register: pg_repo_added
+
+- name: Add apt key for PostgreSQL repo
+  sudo: yes
+  apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
+
+- name: reload apt
+  sudo: yes
+  apt: update_cache=yes
+  when: pg_repo_added.changed
+
+- name: install Postgres
+  sudo: yes
+  apt: pkg={{ item }}
+  with_items:
+    - postgresql-{{ postgresql.version }}
+    - postgresql-contrib-{{ postgresql.version }}
+    - postgresql-{{ postgresql.version }}-postgis-2.1
+    - postgresql-server-dev-{{ postgresql.version }}
+    - libpq-dev
+    - python-psycopg2
+
+- name: ensure user has access to database
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: name=jenkins
+    role_attr_flags=CREATEDB,SUPERUSER
+
+- name: create databases
+  sudo: yes
+  sudo_user: postgres
+  postgresql_db: name={{ item }}
+  with_items:
+    - django
+    - django2
+    - geodjango
+    - geodjango2
+
+- name: enable postgis extension
+  sudo: yes
+  sudo_user: postgres
+  shell: "psql {{ item }} -c 'CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS postgis_topology;'"
+  with_items:
+    - geodjango
+    - geodjango2
+
+- name: Update kernel params
+  sudo: yes
+  sysctl: name=kernel.shmmax value=268435456 state=present
+
+- name: Install PostgreSQL config file
+  sudo: yes
+  template: src=postgresql.conf
+            dest=/etc/postgresql/{{ postgresql.version }}/main/postgresql.conf
+            owner=postgres group=postgres
+  notify:
+    - restart postgresql
+
+- name: create RAM filesytem directory
+  sudo: yes
+  action: file path=/mnt/db state=directory
+          owner=postgres group=postgres
+
+- name: create RAM filesystem fstab entry
+  sudo: yes
+  mount: name={{ postgresql.tmpfs_path }} src=tmpfs fstype=tmpfs opts="size=2048m" state=mounted
+
+- name: Install init script to create RAM tablespace on boot
+  sudo: yes
+  template: src=create-postgresql-ram-tablespace.conf
+    dest=/etc/init/create-postgresql-ram-tablespace.conf

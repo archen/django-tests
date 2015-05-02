@@ -1,0 +1,16 @@
+postgresql:
+  version: 9.4
+
+  user: postgres
+  group: postgres
+
+  tmpfs_path: /mnt/postgres_tmpfs
+
+  config:
+    shared_buffers: 24MB
+    work_mem: 1MB
+
+    checkpoint_segments: 3
+    checkpoint_completion_target: 0.5
+
+    effective_cache_size: 128MB

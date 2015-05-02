@@ -1,0 +1,40 @@
+- name: Jenkins Master
+  hosts: master
+  vars:
+    jenkins_home: /var/lib/jenkins/
+    num_executors: 4
+  roles:
+    - oracle-client
+    - jenkins
+    - browsers
+    - djangodata
+    - memcached
+    - mysql
+    - ntp
+    - nginx
+    - postfix
+    - postgres
+    - python
+    - users
+
+- name: Jenkins Slaves
+  hosts: slaves
+  vars:
+    jenkins_home: /home/jenkins/
+    num_executors: 8
+  roles:
+    - slave
+    - oracle-client
+    - browsers
+    - djangodata
+    - memcached
+    - mysql
+    - ntp
+    - postgres
+    - python
+    - users
+
+- name: Oracle databases
+  hosts: oracle
+  roles:
+    - oracle-server

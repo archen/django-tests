@@ -1,0 +1,92 @@
+- name: install enchant (for spelling check)
+  sudo: yes
+  apt: pkg=enchant
+
+- name: add snake repo signing key
+  sudo: yes
+  apt_key: id=DB82666C
+           url=http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x5BB92C09DB82666C
+           state=present
+
+- name: add snake repository
+  sudo: yes
+  apt_repository: repo='ppa:fkrull/deadsnakes' state=present
+
+- name: install Python
+  sudo: yes
+  apt: pkg=python{{ item }}
+  with_items: python_versions
+
+- name: install Python development libraries
+  sudo: yes
+  apt: pkg=python{{ item }}-dev
+  with_items: python_versions
+
+- name: install setuptools
+  sudo: yes
+  apt: pkg=python-setuptools
+
+- name: download pip
+  get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py dest=/tmp
+
+- name: install pip
+  command: python{{ item }} /tmp/get-pip.py
+  sudo: yes
+  with_items: python_versions
+
+- name: delete get-pip.py
+  file: state=absent path=/tmp/get-pip.py
+
+- name: install virtualenv
+  sudo: yes
+  pip: name=virtualenv
+
+- name: install wheel
+  sudo: yes
+  pip: name=wheel executable=pip{{ item }}
+  with_items: python_versions
+
+- name: update setuptools
+  sudo: yes
+  pip: name=setuptools state=latest executable=pip{{ item }}
+  with_items: python_versions
+
+- name: install extra packages required by Python dependencies
+  sudo: yes
+  apt: pkg={{ item }}
+  with_items:
+    - libffi-dev
+
+- name: create wheelhouse directory
+  sudo: yes
+  sudo_user: jenkins
+  action: file path={{ jenkins_home }}wheelhouse/ state=directory
+
+- name: create wheels (Python 2.X) for test suite dependencies
+  sudo: yes
+  sudo_user: jenkins
+  environment: oracle11_environ
+  shell: pip{{ item[0] }} wheel --wheel-dir={{ jenkins_home }}wheelhouse/ {{ item[1] }}
+  with_nested:
+     - python2_versions
+     - python2_packages
+
+- name: create wheels (Python 2.X) for PIL
+  sudo: yes
+  sudo_user: jenkins
+  shell: pip{{ item }} wheel --wheel-dir={{ jenkins_home }}wheelhouse/ PIL --allow-external PIL --allow-unverified PIL
+  with_items: python2_versions
+
+- name: create wheels (Python 3.X) for test suite dependencies
+  sudo: yes
+  sudo_user: jenkins
+  environment: oracle11_environ
+  shell: pip{{ item[0] }} wheel --wheel-dir={{ jenkins_home }}wheelhouse/ {{ item[1] }}
+  with_nested:
+     - python3_versions
+     - python3_packages
+
+- name: Copy pre-compiled wheels
+  copy: src=wheel/ dest={{ jenkins_home }}wheelhouse/
+  sudo: yes
+  sudo_user: jenkins

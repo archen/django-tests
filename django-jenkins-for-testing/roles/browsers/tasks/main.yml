@@ -1,0 +1,38 @@
+- name: install xvfb
+  sudo: yes
+  apt: pkg=xvfb
+
+- name: add Google Linux repo signing key
+  sudo: yes
+  apt_key: id=7FAC5991
+           url=https://dl-ssl.google.com/linux/linux_signing_key.pub
+           state=present
+
+- name: add Google Chrome repository
+  sudo: yes
+  apt_repository: repo='deb http://dl.google.com/linux/chrome/deb/ stable main' state=present
+
+- name: install Google Chrome
+  sudo: yes
+  apt: pkg=google-chrome-stable
+
+- name: download chromedriver
+  get_url:
+    url=https://chromedriver.storage.googleapis.com/{{ chromedriver_version }}/chromedriver_linux{{ ansible_userspace_bits }}.zip
+    dest=/tmp/chromedriver-{{ chromedriver_version }}.zip
+
+- name: install unzip
+  sudo: yes
+  apt: name=unzip state=present
+
+- name: extract chromedriver from archive
+  sudo: yes
+  shell: unzip -o /tmp/chromedriver-{{ chromedriver_version }}.zip -d /tmp/
+
+- name: copy executable file for chromedriver
+  sudo: yes
+  shell: cp /tmp/chromedriver /usr/local/bin/chromedriver
+
+- name: ensure chromedriver has proper permissions
+  sudo:  yes
+  shell: chmod 755 /usr/local/bin/chromedriver

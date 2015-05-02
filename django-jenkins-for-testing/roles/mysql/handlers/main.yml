@@ -1,0 +1,8 @@
+---
+- name: restart mysql
+  sudo: yes
+  service: name=mysql state=restarted
+
+- name: restart apparmor
+  sudo: yes
+  service: name=apparmor state=restarted

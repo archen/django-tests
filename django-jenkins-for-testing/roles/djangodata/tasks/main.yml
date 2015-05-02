@@ -1,0 +1,12 @@
+- name: copy Django test settings
+  sudo: yes
+  copy: src=./roles/djangodata/files/
+        dest={{ jenkins_home }}djangodata/
+
+- name: install Geospatial libraries
+  sudo: yes
+  apt: pkg={{ item }}
+  with_items:
+    - binutils
+    - gdal-bin
+    - libproj-dev
