@@ -1,0 +1,3 @@
+- name: install git
+  sudo: yes
+  apt: pkg=git
