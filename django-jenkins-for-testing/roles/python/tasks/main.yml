@@ -59,12 +59,10 @@
 
 - name: create wheelhouse directory
   sudo: yes
-  sudo_user: jenkins
   action: file path={{ jenkins_home }}wheelhouse/ state=directory
 
 - name: create wheels (Python 2.X) for test suite dependencies
   sudo: yes
-  sudo_user: jenkins
   environment: oracle11_environ
   shell: pip{{ item[0] }} wheel --wheel-dir={{ jenkins_home }}wheelhouse/ {{ item[1] }}
   with_nested:
@@ -73,13 +71,11 @@
 
 - name: create wheels (Python 2.X) for PIL
   sudo: yes
-  sudo_user: jenkins
   shell: pip{{ item }} wheel --wheel-dir={{ jenkins_home }}wheelhouse/ PIL --allow-external PIL --allow-unverified PIL
   with_items: python2_versions
 
 - name: create wheels (Python 3.X) for test suite dependencies
   sudo: yes
-  sudo_user: jenkins
   environment: oracle11_environ
   shell: pip{{ item[0] }} wheel --wheel-dir={{ jenkins_home }}wheelhouse/ {{ item[1] }}
   with_nested:
@@ -89,4 +85,3 @@
 - name: Copy pre-compiled wheels
   copy: src=wheel/ dest={{ jenkins_home }}wheelhouse/
   sudo: yes
-  sudo_user: jenkins

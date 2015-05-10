@@ -18,7 +18,8 @@ python3_versions:
 python2_packages:
   - bcrypt
   - coverage
-  - cx_oracle
+# Commented out until oracle support is added
+#  - cx_oracle
   - docutils
   - jinja2
   - Markdown
@@ -40,9 +41,11 @@ python2_packages:
 python3_packages:
   - bcrypt
   - coverage
-  - cx_oracle
+# Commented out until oracle support is added
+#  - cx_oracle
   - docutils
-  - isort
+# Can't install due to configparser conflict in isort with Py3.x
+#  - isort
   - jinja2
   - mock
   - mysqlclient
