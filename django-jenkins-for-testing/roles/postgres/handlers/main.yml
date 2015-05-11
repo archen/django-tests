@@ -1,6 +1,6 @@
 ---
 - name: restart postgresql
   docker:
-    name: django-psql
-    image: archen/django-psql
+    name: django-test-psql
+    image: archen/django-test-psql
     state: restarted
