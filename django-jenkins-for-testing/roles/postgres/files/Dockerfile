@@ -10,7 +10,7 @@ ADD postgresql.conf /etc/postgresql/9.4/main/postgresql.conf
 ADD pg_hba.conf /etc/postgresql/9.4/main/pg_hba.conf
 RUN chown postgres:postgres /etc/postgresql/9.4/main/*.conf
 
-RUN sysctl -w kernel.shmmax=268435456
+# RUN sysctl -w kernel.shmmax=268435456
 RUN mkdir -p /mnt/db && chown postgres:postgres /mnt/db
 ADD create-postgresql-ram-tablespace.conf /etc/init/create-postgresql-ram-tablespace.conf
 RUN echo 'tmpfs   /mnt/db         tmpfs   nodev,nosuid,size=2G          0  0' >> /etc/fstab
@@ -21,7 +21,7 @@ RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER postgres
 
 RUN /etc/init.d/postgresql start &&\
-    psql --command "CREATE USER jenkins SUPERUSER;" &&\
+    psql --command "CREATE USER jenkins WITH SUPERUSER LOGIN CREATEDB;" &&\
     createdb -O jenkins django &&\
     createdb -O jenkins django2 &&\
     createdb -O jenkins geodjango &&\
