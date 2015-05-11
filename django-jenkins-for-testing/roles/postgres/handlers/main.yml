@@ -1,4 +1,6 @@
 ---
 - name: restart postgresql
-  sudo: yes
-  service: name=postgresql state=restarted
+  docker:
+    name: django-psql
+    image: archen/django-psql
+    state: restarted
